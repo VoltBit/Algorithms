@@ -12,16 +12,16 @@ int rise(int x, int power){
 
 int main(){
 	int a,b;
-    freopen("lgput.in","r",stdin);
-    freopen("lgput.out","w",stdout);
-    scanf("%d %d", &a, &b);
+    // freopen("lgput.in","r",stdin);
+    // freopen("lgput.out","w",stdout);
+    // scanf("%d %d", &a, &b);
     
-	// printf("a: ");
-	// scanf("%i",&a);
-	// printf("b: ");
-	// scanf("%i",&b);
+	printf("a: ");
+	scanf("%i",&a);
+	printf("b: ");
+	scanf("%i",&b);
 	
-	// printf("\na ^ b = %i\n\n", rise(a,b));
-	printf("%d\n", rise(a,b));
+	printf("\na ^ b = %i\n\n", rise(a,b));
+	// printf("%d\n", rise(a,b));
 	return 0;
 }
