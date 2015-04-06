@@ -78,13 +78,7 @@ void solveTwoKnapsacks(){
 				if(j >= weight[k] && i >= weight[k]){
 					aux1 = dp[i - weight[k]][j] + value1[k];
 					aux2 = dp[i][j - weight[k]] + value2[k];
-					/* load balancing - if I can put the item in either bag then I will put it in the one that is less full */
-					if(aux1 == aux2 && dp[i][j] < aux1){
-						if(trace[i - weight[k]][j].size() > trace[i][j - weight[k]].size()) 
-							dp[i][j] = aux1;
-						else dp[i][j] = aux2;
-					} 
-					else dp[i][j] = getMax(dp[i][j], aux1, aux2);
+					dp[i][j] = getMax(dp[i][j], aux1, aux2);
 					if(dp[i][j] == aux1){
 						index var; 
 						var.bag = 1;
@@ -126,7 +120,7 @@ void solveTwoKnapsacks(){
 	// printf("\nSum1: %i\nSum2: %i\n", sum1, sum2);
 	for(i = 0; i <= maxWeight1; i++){
 		for(j = 0; j <= maxWeight2; j++){
-			printf("value: %i list: { ", dp[i][j]);
+			// printf("value: %i list: { ", dp[i][j]);
 			list<index>::iterator itr = trace[i][j].begin();
 			int sum1 =0, sum2 = 0;
 			for(size_t r = 0; r < trace[i][j].size(); r++, itr++){
@@ -140,7 +134,7 @@ void solveTwoKnapsacks(){
 				}
 			}
 			if(sum1 * sum2 > maxProd) maxProd = sum1 * sum2;
-			printf("}\t%i * %i = %i\n", sum1, sum2, sum1 * sum2);
+			// printf("}\t%i * %i = %i\n", sum1, sum2, sum1 * sum2);
 		}
 		// printf("\n");
 	}
@@ -165,17 +159,11 @@ void checkInput(){
 }
 
 int main(){
-	clock_t begin = clock();
-
-	getInput("teste_excursie/excursie5.in");
+	getInput("teste_excursie/excursie7.in");
 	// checkInput();
 	// solveKnapsack(1);
-	solveKnapsack(2);
-	// solveTwoKnapsacks();
+	// solveKnapsack(2);
+	solveTwoKnapsacks();
 	// displayState();
-
-	clock_t end = clock();
-	double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-	printf("\nTime: %f\n", elapsed_secs);
 	return 0;
 }
