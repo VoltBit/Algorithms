@@ -27,8 +27,11 @@ void getInput(const char* inputFile){
 	// v.resize(n,0);
 	// s.resize(n * 2, 0);
 	int i;
-	for(i = 0; i < n; i++)
+	for(i = 0; i < n; i++){
 		inp >> v[i]; 
+		printf("%li ", v[i]);
+	}
+	printf("\n");
 	inp.close();
 }
 void generate(long size, long mat[MAX_SIZE][MAX_SIZE]){
@@ -135,16 +138,77 @@ void preformanceTest(){
 
 // }
 
+long getPos(long val){
+	long p1 = 0, p2 = n - 1;
+	long counter = 0;
+	while(p1 <= p2){
+		// counter++;
+		if(v[p1] + v[p2] == val){
+			printf("Pointers: (%li %li -> %li %li)", p1, p2, p1 + p2, p2 - p1);
+			return counter;
+		}
+		if(v[p1] + v[p2] < val){
+			// printf("%li ", v[p1] + v[p2]);
+			counter = counter + p2 - p1;
+			p1++;
+		}
+		else{
+			// printf("%li ", v[p1] + v[p2]);
+			// counter = counter + p2 - p1;
+			p2--;
+		}
+	} printf("\n");
+	return counter;
+}
+
+void displaySums(){
+	int i, j;
+	long aux[200], counter = 0;
+	for(i = 0; i < n; i++) printf("%li ", v[i]);
+	printf("\n");
+	for(i = 0; i < n; i++){
+		for(j = 0; j < n; j++){
+			aux[counter] = v[i] + v[j];
+			counter++;
+		}
+	}
+	qsort(aux, counter, sizeof(long), comp);
+	// for(i = 0; i < counter; i++){
+	// 	printf("%li [%li]\t", aux[i], getPos(aux[i]));
+	// } printf("\n");
+	for(i = 0; i < counter; i++){
+		printf(" [%li] -> [%i] val: %li\n", getPos(aux[i]), i, aux[i]);
+	} printf("\n");
+
+}
+
+void solver(){
+	int limit = log2(2 * v[n - 1]);
+	long val = 2 * v[0], newVal;
+	while(limit >= 0){
+		newVal = val + (1 << limit);
+		if(getPos(val) == k){
+			printf("Value found: %li", val);
+			break;
+		}
+		if(getPos(val) < k && newVal < 2 * v[n - 1]){
+			val = newVal;
+		}
+		limit--;
+	}
+	printf("%li\n", val);
+}
+
 int main(){
 	clock_t begin = clock();
 
-	getInput("teste_patrat/patrat0.in");
+	getInput("teste_patrat/patrat1.in");
 	qsort(v, n, sizeof(long), comp);
-	// binarySearch(10);
-	test1();
-	// preformanceTest();
-	// solve();
-	// queueSolver();
+	
+	displaySums();
+	// solver();
+
+
 	clock_t end = clock();
 	double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
 	printf("\nTime: %f\n", elapsed_secs);
