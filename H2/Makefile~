@@ -1,0 +1,18 @@
+build-p1: colours.cpp graph.cpp graph.h
+	g++ -Wall -o colours colours/colours.cpp colours/graph.cpp
+
+build-p2: exhibition.cpp graph2.cpp graph2.h
+	g++ -Wall -O3 -o exhibition exhibition2.cpp graph2.cpp
+
+run-p1: build-p1
+	./colours
+
+run-p2: build-p2
+	./exhibition
+
+run: build
+	./exq
+
+clean:
+	rm -f exhibition
+	rm -f colours

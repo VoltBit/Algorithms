@@ -1,0 +1,18 @@
+Dobre Andrei Ciprian 325CB
+
+Problema 1 - Excursie
+
+Am rezolvat partial problema folosind tehnica programarii dinamice. De la inceput am considerat mai usor sa rezolv problema rucsacului decat o problema de partitionare.
+
+Ideea de rezolvare consta in realizarea unei structuri care sa retina pentru fiecare combinatie posibila de greutati, valoarea maxima. Strctura consta intr-o matrice unde fiecare element retine o lista de numere - valorile obiectelor cu care a fost calculata valoarea curenta. Lista contine structuri definite sub forma <sac, obiect> si retine indexul obiectului si rucsacul in care a fost pus.
+
+In cadrul algoritmului se incearca tot timpul adaugarea obicetului astfel incat profitul sa fie cat mai mare. La fiecare pas fie este adaugat obiecul curent + cea mai buna alegere pentru spatiul ramas, fie nu este adaugat intrucat valoarea ar scadea. Pe parcursul algoritmului nu se tine cont de produsul maxim calculat sau de produsul maxim posibil si nici nu sunt calculate sumele separat pentru cei doi rucsaci.
+
+Obtinerea sumelor si a produsului se fac dupa gasirea celei mai bune configuratii prin algoritmul descris mai sus. Dupa ce strucutra de date a fost completata algoritmul itereaza prin fiecare lista de structuri, calculeaza sumele si produsele si retine cel mai mare produs gasit.
+
+Complexitatea algoritmului este pseudo-liniara, exista o singura iteratie pe toate cele n obiecte insa pentru fiecare element matricea G1 x G2 este parcursa. Deci numarul de elemente n este inmultit cu o constanta data de produsul dintre G1 si G2, greutatile maxime admise de cei doi rucsaci => O( n * G1 * G2).
+
+
+Problema 2 - Patrat
+
+Abordarea mea a fost urmatoarea: parcurg cu o cautarea binara one-sided valorile posibile dintre 2*v[0] si 2*v[n-1], pentru valorile alese gasesc cea mai apropiata suma (O(n)) apoi gasesc indicele acestei sume, daca este < k continui cautarea binara in stanga, altfel in dreapta. Nu am reusit sa calculez corect indicele sumei si in plus cel mai probabil ar fi fost o operatie de O(N^2) / 2 deci ajungeam la ~O(klog(k)). Imi dau seama ca problema trebuia rezolvata in cel mult O(nlog(k)).

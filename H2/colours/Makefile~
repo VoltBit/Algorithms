@@ -1,0 +1,15 @@
+build: colours.cpp graph.h
+	g++ -Wall -o exq colours.cpp graph.cpp
+
+build-p1: colours.cpp graph.h
+	g++ -O3 -Wall -o exq colours.cpp graph.cpp
+
+run-p1: build-p1
+	g++ -O3 -Wall -o exq colours.cpp graph.cpp
+	./exq
+
+run: build
+	./exq
+
+clean:
+	rm -f exq
