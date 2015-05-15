@@ -49,7 +49,7 @@ void bellman_ford(Graph* G, int origin, int destination){
 	G->nodes[origin].p = -1;
 	map < pair<int, int>, pair<int, char> >::iterator mit;
 	for(it = G->adjacency_list[origin].begin(); it != G->adjacency_list[origin].end(); it++){
-		G->nodes[*it].dist = G->costs[origin][*it];
+		G->nodes[*it].dist = \G->costs[origin][*it];
 	}
 	// for(i = 0; i < G->N - 1; i++){
 	// 	for(mit = G->edges.begin(); mit != G->edges.end(); mit++){
@@ -68,8 +68,8 @@ void bellman_ford(Graph* G, int origin, int destination){
 		}
 	}
 		for(mit = G->edges.begin(); mit != G->edges.end(); mit++){
-		printf("(%i,%i) -> %i [%c]\n", mit->first.first, mit->first.second, mit->second.first, mit->second.second);
-	}
+			printf("(%i,%i) -> %i [%c]\n", mit->first.first, mit->first.second, mit->second.first, mit->second.second);
+		}
 }
 
 int main(){
