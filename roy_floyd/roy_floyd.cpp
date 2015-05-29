@@ -82,8 +82,8 @@ void roy_floyd(Graph* G, int origin, int destination){
 	}
 	printf("Shortest path: \n");
 	display_path(Next, origin, destination);
-	printf("\n");
-	display_all(Next, G);
+	// printf("\n");
+	// display_all(Next, G);
 }
 
 int main(){

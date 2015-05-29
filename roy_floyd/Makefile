@@ -3,6 +3,7 @@ build: graph.cpp graph.h roy_floyd.cpp
 
 run: build
 	./roy_floyd
+	rm -f roy_floyd
 
 clean:
 	rm roy_floyd

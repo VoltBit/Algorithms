@@ -1,0 +1,367 @@
+#include <iostream>
+#include <vector>
+#include <set>
+#include <fstream>
+#include <queue>
+#include <string>
+#define MAXN 45
+int capmat[MAXN][MAXN];
+int adjmat[MAXN][MAXN];
+int n,a,b;
+void init_capmat(){
+	for(int i = 0; i < n; i++){
+		for(int j = 0; j < n; j++){
+			capmat[i][j] = adjmat[i][j];
+		}
+	}
+}
+
+void init_parents(std::vector<int>* parents){
+	for(int i = 0; i < n; i++){
+		parents->push_back(-1);
+	}
+}
+
+void remove_node(int node){
+	for(int i = 0; i < n; i++){
+		adjmat[node][i] = 0;
+		adjmat[i][node] = 0;
+	}
+}
+
+std::vector<int> bfs(){
+	int source = a, dst = b;
+	std::vector<int> p;
+	init_parents(&p);
+	std::queue<int> Q;
+	Q.push(source);
+	while(p[dst] == -1 && !Q.empty()){
+		int node = Q.front();
+		Q.pop();
+		for(int i = 0; i < n; i++){
+			if(capmat[node][i]  > 0 && p[i] == -1){
+				p[i] = node;
+				Q.push(i);
+				// std::cout << i << " ";
+			}
+		}
+	}
+
+	if(p[dst] == -1){
+		return *(new std::vector<int>());
+	}
+
+	// std::cout << "\nnew path: ";
+	std::vector<int> path;
+	for(int node = dst; ; node = p[node]){
+		if(p[node] == -1) break;
+		// std::cout << p[node] << " ";
+		path.push_back(node);
+	}
+	// std::cout << std::endl;
+	return path;
+}
+
+int saturate_path(std::vector<int> path){
+	if(path.size() < 2){
+		return 0;
+	}
+
+	int flow = capmat[path[0]][path[1]];
+	for(int i = 0; i < path.size() - 1; i++){
+		if(flow < capmat[path[i + 1]][path[i]])
+			flow = capmat[path[i + 1]][path[i]];
+	}
+
+	for(int i = 0; i < path.size() - 1; i++){
+		capmat[path[i + 1]][path[i]] -= flow;
+		capmat[path[i]][path[i + 1]] += flow;
+	}
+	return flow;
+}
+
+int max_flow(){
+	int maxflow = 0, flow = 0;
+	int source = a, dst = b;
+	std::vector<int> new_path;
+	while(true){
+		new_path.clear();
+		new_path = bfs();
+		flow = saturate_path(new_path);
+		if(flow == 0)return maxflow;
+		if(maxflow < flow) maxflow += flow;
+		// std::cout << "\nmaxflow: " << maxflow << std::endl;
+	}
+}
+
+void min_cut(std::set<std::pair<int, int> >* edges){
+	std::vector<bool> queued;
+	int source = a;
+	for(int i = 0; i < n; i++){
+		queued.push_back(false);
+	}
+	// for(int i = 0; i < n; i++){
+	// 	for(int j = 0; j < n; j++){
+	// 		std::cout << capmat[i][j] << " ";
+	// 	}
+	// 	std::cout << std::endl;
+	// }
+	std::queue<int> Q;
+	Q.push(source);
+	queued[0] = true;
+	while(!Q.empty()){
+		int node = Q.front();
+		Q.pop();
+		for(int i = 0; i < n; i++){
+			if(!queued[i] && capmat[node][i] > 0){
+				queued[i] = true;
+				Q.push(i);
+			}
+		}
+		// std::cout << "\ninit: " << edges->size() << std::endl;
+		// std::queue<int>::iterator qit;
+		// for(qit = Q.begin(), int i = 0; qit != Q.end(); qit++, i++){
+		// 	if(*qit)
+		// 		std::cout << i << std::endl;
+		// }
+	}
+	for(int i = 0; i < n; i++){
+		if(queued[i]){
+			for(int j = 0; j < n; j++){
+				if(!queued[j] && adjmat[i][j] > 0){
+					// std::cout << "[" << i << ", " << j << "]\n";
+					edges->insert(std::make_pair(i, j));
+				}
+			}
+		}
+	}
+}
+
+int solve_dst_two(){
+	int counter = 0;
+	for(int i = 0; i < n; i++){
+		if(adjmat[a][i] == 1 && adjmat[b][i] == 1){
+			counter++;
+			remove_node(i);
+		}
+	}
+	return counter;
+}
+
+void filter_distances(){
+	char ngh[MAXN] = {'n'};
+	bool checked[MAXN] = {false};
+	checked[a], checked[b] = true;
+	for(int i = 0; i < n; i++){
+		if((a != i && b != i) && (adjmat[a][i] == 0 && adjmat[b][i] == 0)){
+			remove_node(i);
+		}
+		else if((a != i && b != i) && adjmat[a][i] == 1){
+			ngh[i] = 'a';
+		} else if((a != i && b != i) && adjmat[b][i] == 1){
+			ngh[i] = 'b';
+		}
+	}
+	bool check;
+	for(int i = 0; i < n; i++){
+		check = false;
+		if(ngh[i] == 'a'){
+			for(int j = 0; j < n; j++){
+				if(adjmat[i][j] == 1 && ngh[j] == 'b'){
+					adjmat[j][i] = 0;
+					check = true;
+				}
+				if(!check)
+					remove_node(i);
+			}
+		}
+		else if(ngh[i] == 'b'){
+			check = false;
+			for(int j = 0; j < n; j++){
+				if(adjmat[i][j] == 1 && ngh[j] == 'a'){
+					adjmat[i][j] = 0;
+					check = true;
+				}
+			}
+			if(!check)
+				remove_node(i);
+		}
+		// else
+		// 	remove_node(i);
+	}
+}
+
+void main_filter(){
+	std::set<int> ngh_a, ngh_b;
+	for(int i = 0; i < n; i++){
+		if(adjmat[a][i] == 1){
+			ngh_a.insert(i);
+			adjmat[i][a] = 0;
+			for(int j = 0; j < n; j++){
+				if(adjmat[i][j] == 1 && j != a)
+					adjmat[j][i] = 0;
+			}
+		}
+		else if(adjmat[b][i] == 1){
+			ngh_b.insert(i);
+			adjmat[b][i] = 0;
+			for(int j = 0; j < n; j++){
+				if(adjmat[i][j] == 1 && j != b)
+					adjmat[i][j] = 0;
+			}
+		}
+	}
+	for(int i = 0; i < n; i++){
+		if(ngh_a.find(i) == ngh_a.end() && ngh_b.find(i) == ngh_a.end()){
+			remove_node(i);
+		}
+	}
+	std::set<int>::iterator it1, it2;
+	bool check;
+	for(it1 = ngh_a.begin(); it1 != ngh_a.end(); it1++){
+		check = false;
+		for(it2 = ngh_b.begin(); it2 != ngh_b.end(); it2++){
+			if(adjmat[*it1][*it2] == 1 || adjmat[*it1][*it2] == 1){
+				// std::cout << *it1 << " " << *it2 << std::endl;
+				check = true;
+				break;
+			}
+		}
+		if(!check){
+			remove_node(*it1);
+			ngh_a.erase(it1);
+		}
+	}
+
+	// for(it1 = ngh_b.begin(); it1 != ngh_b.end(); it1++){
+	// 	check = false;
+	// 	for(it2 = ngh_a.begin(); it2 != ngh_a.end(); it2++){
+	// 		if(adjmat[*it1][*it2] == 1 || adjmat[*it2][*it1] == 1){
+	// 			check = true;
+	// 			break;
+	// 		}
+	// 	}
+	// 	if(!check){
+	// 		remove_node(*it1);
+	// 		ngh_b.erase(it1);
+	// 	}
+	// }
+
+	for(int i = 0; i < n; i++){
+		if((i != a && i != b) && ngh_a.find(i) == ngh_a.end() && ngh_b.find(i) == ngh_b.end())
+			remove_node(i);
+	}
+}
+
+void direct_graph(){
+	int i,j;
+	for(i = 0; i < n; i++){
+		if(adjmat[a][i] == 1){
+			adjmat[i][a] = 0;
+		}
+		if(adjmat[b][i] == 1){
+			adjmat[b][i] = 0;
+		}
+	}
+}
+
+void get_input(const char* file_name){
+	// std::cout << "Reading from: \n" << file_name << std::endl;
+	std::ifstream in(file_name);
+	in >> n;
+	for(int i = 0; i < n; i++){
+		for(int j = 0; j < n; j++){
+			in >> adjmat[i][j];
+		}
+	}
+	in >> a >> b;
+	in.close();
+}
+
+void disp_mat(){
+	std::cout << std::endl;
+	for(int i = 0; i < n; i++){
+		for(int j = 0; j < n; j++){
+			std::cout << adjmat[i][j] << " ";
+		}
+		std::cout << std::endl;
+	}
+}
+
+void disp_graph(){
+	for(int i = 0; i < n; i++){
+		std::cout << i << ": ";
+		for(int j = 0; j < n; j++){
+			if(adjmat[i][j] == 1)
+				std::cout << j << ", ";
+		}
+		std::cout << "\b\b  \n";
+	}
+}
+
+void drr(){
+	std::set<int> ngh_a, ngh_b;
+	for(int i = 0; i < n; i++){
+		if(adjmat[a][i] == 1){
+			ngh_a.insert(i);
+			adjmat[i][a] = 0;
+			for(int j = 0; j < n; j++){
+				if(adjmat[i][j] == 1 && j != a)
+					adjmat[j][i] = 0;
+			}
+		}
+		else if(adjmat[b][i] == 1){
+			ngh_b.insert(i);
+			adjmat[b][i] = 0;
+			for(int j = 0; j < n; j++){
+				if(adjmat[i][j] == 1 && j != b)
+					adjmat[i][j] = 0;
+			}
+		}
+	}
+	for(int i = 0; i < n; i++){
+		if(ngh_a.find(i) != ngh_a.end()){
+			adjmat[i][a] = 0;
+		}
+		else if(ngh_b.find(i) != ngh_b.end()){
+			adjmat[b][i] = 0;
+		}
+	}
+}
+
+int main(){
+	// clock_t begin = clock();
+	// double elapsed_secs;	
+	int sol = 0;
+	get_input("prieteni.in");
+
+	// disp_mat();
+	// std::cout << std::endl;
+	// disp_graph();
+	sol = solve_dst_two();
+	// std::cout << "At distance two: " << sol << std::endl;
+	// std::cout << std::endl;
+	// filter_distances();
+	// main_filter();
+	drr();
+	// direct_graph();
+	// disp_mat();
+	// std::cout << std::endl;
+	// disp_graph();
+	init_capmat();
+
+	int flow = max_flow();
+	std::set<std::pair<int, int> > edges;
+	min_cut(&edges);
+	// for(std::vector<std::pair<int, int> >::iterator it = edges.begin(); it != edges.end(); it++)
+	// 	std::cout << "[" << it->first << ", " << it->second << "]";
+
+	// std::cout << "Solution: " << sol + edges.size() << std::endl;
+	std::ofstream out("prieteni.out");
+	out << sol + edges.size();
+	out.close();
+	// clock_t end = clock();
+	// elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+	// printf("\nTime: %f\n", elapsed_secs);
+	return 0;
+}
